@@ -13,6 +13,27 @@ class SongContainer extends Component {
   componentDidMount() {
     this.getSongs();
   }
+  
+  addSong = async (e, song) => {
+    e.preventDefault();
+    console.log(song);
+
+    try {
+      // The createdSongResponse variable will store the response from the Flask API
+      const createdSongResponse = await axios.post(
+        process.env.REACT_APP_FLASK_API_URL + '/api/v1/songs/',
+        song
+      );
+
+      console.log(createdSongResponse.data.data, ' this is response');
+      this.setState({
+        songs: [...this.state.songs, createdSongResponse.data.data],
+      });
+    } catch (err) {
+      console.log('error', err);
+    }
+  };
+
   getSongs = async () => {
     try {
       const parsedSongs = await axios(
@@ -28,7 +49,12 @@ class SongContainer extends Component {
   };
 
   render() {
-    return <SongList songs={this.state.songs} />;
+    return (
+      <>
+        <SongList songs={this.state.songs}/>
+        <CreateSongForm addSong={this.addSong}/>
+      </>
+    )
   }
 }
 
